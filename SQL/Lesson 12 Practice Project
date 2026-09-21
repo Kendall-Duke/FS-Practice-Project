@@ -1,0 +1,61 @@
+CREATE TABLE IF NOT EXISTS customer_table(
+ id INTEGER Primary Key Autoincrement, 
+ name VARCHAR(100),
+ location VARCHAR(100),
+ phone_number Integer);
+
+Insert Into customer_table(id,name,location,phone_number)
+Values ('1111','Nisha','kerala', '8392320'),
+    ('1212', 'Oliver', 'kerala', '4353891'),
+    ('1216', 'Nila', 'delhi', '3323242'),
+    ('1246', 'Vignesh', 'chennai', '1111212'),
+    ('1313', 'Shiny', 'maharastra', '5454543'),
+    ('1910', 'Mohan', 'mumbai', '9023941'),
+    ('2123', 'Biyush', 'bombay', '1253358'),
+    ('3452', 'Alexander','west bengal', '1212134'),
+    ('3921', 'Mukesh', 'manipur', '4232321'),
+    ('5334', 'Christy', 'pakistan', '2311111'),
+    ('9021', 'Rithika', 'kashmir', '1121344'),
+    ('9212', 'Jessica', 'banglore', '1233435'),
+    ('9875', 'Stephen', 'chennai', '1212133');
+
+Select *
+From customer_table;
+
+CREATE TABLE IF NOT EXISTS product_table(
+ p_code INTEGER Primary Key Autoincrement, 
+ p_name VARCHAR(250),
+ price INTEGER,
+ stock Integer,
+ category VARCHAR (250));
+
+Select *
+From product_table;
+
+CREATE TABLE IF NOT EXISTS sales_table(
+ p_code INTEGER Primary Key Autoincrement, 
+ p_name VARCHAR(250),
+ order_date DATE,
+ order_no INTEGER,
+ c_id INTEGER,
+ c_name VARCHAR(250),
+ s_code INTEGER,
+ qty INTEGER,
+ price INTEGER);
+
+Select *
+From sales_table;
+
+Select order_no, c_id, order_date, price, qty 
+From sales_table; 
+
+Select *
+From product_table pt 
+Where category is 'Stationary';
+
+Select distinct category
+From product_table;
+
+Select *  
+From product_table pt 
+Order By price desc;
