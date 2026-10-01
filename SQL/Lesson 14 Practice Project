@@ -1,0 +1,53 @@
+CREATE TABLE IF NOT EXISTS patients_table(
+ pid VARCHAR primary key, 
+ date Date, 
+ p_name VARCHAR(255) NULL,
+ age INTEGER,
+ weight Integer,
+ gender VARCHAR (100),
+ location VARCHAR(255) NULL,
+ phone_no Integer,
+ disease VARCHAR(255) NULL,
+ doctor_name VARCHAR(255) NULL, 
+ doctor_id Integer);
+
+Insert Into patients_table(pid,date,p_name,age,weight,gender,location,phone_no,disease,doctor_name,doctor_id)
+Values ('15-06-2019','AP2021','Sarath','67','76','Male','chennai', '5462829','Cardiac','Mohan','21'),
+    ('13-02-2019','AP2022', 'John','62','80', 'Male','banglore', '1234731','Cancer','Suraj','22'),
+    ('08-01-2019','AP2023', 'Henry','43','65', 'Male','Kerala', '9028320','Liver','Mehta','23'),
+    ('04-02-2020','AP2024', 'Carl','56','73', 'Female','Mumbai', '9293829','Asthma','Karthik','24'),
+    ('15-09-2017','AP2025', 'Shikar','55','71', 'Male','Delhi', '7821281','Cardiac','Mohan','21'),
+    ('22-07-2018','AP2026', 'Piysuh','47','59', 'Male','Haryana', '8912819','Cancer','Suraj','22'),
+    ('25-03-2017','AP2027', 'Stephen','69','55', 'Male','Gujarat', '8888211','Liver','Mehta','23'),
+    ('22-04-2019','AP2028', 'Aaron','75','53','Male','Banglore', '9012192','Asthma','Karthik','24');
+
+Select *
+From patients_table;
+
+Select count(distinct pid)
+From patients_table;
+
+Select pid, p_name, DATE('now') 
+From patients_table;
+
+Select p_name as old_patient_name,
+Upper(p_name) as new_patient_name
+From patients_table;
+
+Select p_name, LENGTH(p_name) as character_count
+From patients_table;
+
+Select CONCAT(p_name,', ',doctor_name) as patient_doctor_names
+From patients_table; 
+
+SELECT date, substr(date,7,4) AS extracted_year
+FROM patients_table;
+
+SELECT doctor_name, COUNT(*) AS count
+FROM patients_table
+GROUP BY doctor_name
+HAVING COUNT(*) > 1;
+
+
+
+
