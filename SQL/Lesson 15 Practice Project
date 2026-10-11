@@ -1,0 +1,52 @@
+CREATE TABLE IF NOT EXISTS xyz_employee(
+ emp_id INTEGER Primary Key Autoincrement, 
+ f_name VARCHAR(100),
+ l_name VARCHAR(100),
+ job_id VARCHAR(100),
+ salary Integer,
+ manager_id Integer,
+ dept_id Integer
+);
+
+Insert Into xyz_employee(emp_id,f_name,l_name,job_id,salary,manager_id,dept_id)
+Values ('101','John','Smith', 'JP123','70000','02','30'),
+    ('102', 'Emily','Johnson', 'EN456','80000','03','40'),
+    ('103', 'Michael','Williams', 'MW789','90000','04','20'),
+    ('104', 'Emma','Jones', 'EJ567','75000','02','10'),
+    ('105', 'Calvin','Miller', 'CM345','85000','03','30'),
+    ('106', 'Sophia','Davis', 'SD678','95000','04','20'),
+    ('107', 'Liam','Moore', 'LM901','72000','02','40'),
+    ('108', 'Olivia','Anderson', 'OA234','87000','03','10'),
+    ('109', 'William','Brown', 'WB567','92000','04','30'),
+    ('110', 'Ava','Taylor', 'AT890','78000','02','20');
+
+SELECT xe.f_name, xe.l_name
+FROM xyz_employee xe 
+JOIN xyz_employee xe2 
+  ON xe.salary > xe2.salary
+WHERE xe2.f_name = 'Calvin';
+
+Select emp_id, l_name
+from xyz_employee xe 
+where xe.salary > (select avg(salary) from xyz_employee);
+
+SELECT emp_id, f_name
+FROM (
+    SELECT emp_id, f_name, salary
+    FROM xyz_employee xe
+    EXCEPT
+    SELECT xe1.emp_id, xe1.f_name, xe1.salary
+    FROM xyz_employee xe1
+    JOIN xyz_employee xe2 ON xe2.job_id = 'MW789'
+    WHERE xe1.salary <= xe2.salary
+)
+ORDER BY salary;
+
+Select xe.f_name, xe.emp_id, xe.salary 
+From (
+	Select DISTINCT salary 
+	From xyz_employee xe 
+	Order by salary DESC
+	Limit 3
+) as Top_Earners 
+Join xyz_employee xe on xe.salary = top_earners.salary;
