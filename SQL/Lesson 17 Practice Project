@@ -1,0 +1,101 @@
+CREATE VIEW CourseSummary AS
+WITH cte AS (
+    SELECT 
+        c.CourseId, 
+        c.CourseName, 
+        COUNT(e.StudentID) AS Total_Students
+    FROM courses c
+    LEFT JOIN enrollment e ON e.CourseId = c.CourseId
+    GROUP BY c.CourseId, c.CourseName
+)
+SELECT CourseId, CourseName, Total_Students 
+FROM cte;
+
+Select * 
+From CourseSummary cs; 
+
+CREATE VIEW InstructorSchedule AS
+WITH cte AS (
+    SELECT 
+        i.InstructorName, 
+        c.CourseName, 
+        c.Department 
+    FROM courses c
+    LEFT JOIN instructor i ON c.department = i.department
+    GROUP BY i.InstructorName, c.CourseName, c.Department 
+)
+SELECT InstructorName, CourseName, Department
+FROM cte;
+
+Select *
+From InstructorSchedule;
+
+drop view if exists CourseSummary;
+
+create view CourseSummary as
+select c.CourseID,
+       c.CourseName,
+       group_concat(distinct e.Semester) as Semesters_Offered,
+       count(e.StudentID)                as Total_Students
+from Courses c
+left join Enrollment e on e.CourseID = c.CourseID
+group by c.CourseID, c.CourseName;
+
+select *
+from CourseSummary cs;
+
+drop view if exists InstructorSchedule;
+
+CREATE VIEW InstructorSchedule AS
+WITH cte AS (
+    SELECT 
+        i.InstructorName, 
+        c.CourseName, 
+        e.Semester,
+        c.Department
+    FROM courses c
+    LEFT JOIN instructor i ON c.department = i.department
+    LEFT JOIN enrollment e ON e.CourseID = c.CourseID
+    WHERE e.Semester like 'Fall%'
+    GROUP BY i.InstructorName, c.CourseName, e.Semester, c.Department 
+)
+SELECT InstructorName, CourseName, Semester, Department
+FROM cte;
+
+select *
+from InstructorSchedule t; 
+
+create view EligibleGraduates as
+select s.StudentID,
+       s.First_Name,
+       s.Last_Name,
+       s.Major,
+       s.GPA
+from students s
+where s.GPA >= 3.7;
+
+select *
+from EligibleGraduates eg;
+
+drop view if exists CourseSummary;
+
+create view CourseEnrollmentSummary as
+select c.CourseID,
+       c.CourseName,
+       group_concat(distinct e.Semester) as Semesters_Offered,
+       count(e.StudentID)                as Total_Students
+from Courses c
+left join Enrollment e on e.CourseID = c.CourseID
+group by c.CourseID, c.CourseName;
+
+drop view if exists EligibleGraduates;
+
+Create view SemesterCourses as
+select c.CourseID,
+       c.CourseName,
+       e.Semester,
+       count(e.StudentID) as Total_Students
+from Courses c
+left join Enrollment e on e.CourseID = c.CourseID
+where e.Semester like 'Fall%'
+group by c.CourseID, c.CourseName, e.Semester;
