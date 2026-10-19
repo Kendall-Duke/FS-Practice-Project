@@ -1,0 +1,105 @@
+CREATE TABLE IF NOT EXISTS product_table(
+ product_id INTEGER Primary Key Autoincrement, 
+ product_name VARCHAR(255), 
+ category VARCHAR(255));
+
+Insert Into product_table(product_id,product_name,category)
+Values (1, 'Laptop', 'Electronics'),
+       (2, 'Smartphone', 'Electronics'),
+       (3, 'Coffee Maker', 'Appliances'),
+       (4, 'Running Shoes', 'Apparel');
+
+CREATE TABLE IF NOT EXISTS sales_table(
+ sale_id INTEGER, 
+ product_id INTEGER, 
+ sale_date DATE, 
+ quantity_sold INTEGER);
+
+Insert Into sales_table(sale_id,product_id,sale_date,quantity_sold)
+Values (1, 1, '2023-01-05', 10),
+		(2, 2, '2023-01-10', 15),
+		(3, 3, '2023-01-15', 8),
+		(4, 4, '2023-01-20', 12),
+		(5, 1, '2023-02-05', 14),
+		(6, 2, '2023-02-12', 18),
+		(7, 3, '2023-02-18', 9),
+		(8, 4, '2023-02-25', 16),
+		(9, 1, '2023-03-06', 20),
+		(10, 2, '2023-03-11', 22),
+		(11, 3, '2023-03-16', 13),
+		(12, 4, '2023-03-24', 18),
+		(13, 1, '2023-04-05', 16),
+		(14, 2, '2023-04-10', 24),
+		(15, 3, '2023-04-18', 11),
+		(16, 4, '2023-04-28', 19),
+		(17, 1, '2023-05-07', 21),
+		(18, 2, '2023-05-12', 28),
+		(19, 3, '2023-05-19', 15),
+		(20, 4, '2023-05-26', 22),
+		(21, 1, '2023-06-04', 18),
+		(22, 2, '2023-06-13', 26),
+		(23, 3, '2023-06-21', 14),
+		(24, 4, '2023-06-29', 20),
+		(25, 1, '2024-01-06', 24),
+		(26, 2, '2024-01-11', 30),
+		(27, 3, '2024-01-17', 16),
+		(28, 4, '2024-01-23', 25),
+		(29, 1, '2024-02-04', 26),
+		(30, 2, '2024-02-09', 32),
+		(31, 3, '2024-02-15', 18),
+		(32, 4, '2024-02-21', 27),
+		(33, 1, '2024-03-03', 28),
+		(34, 2, '2024-03-10', 35),
+		(35, 3, '2024-03-18', 20),
+		(36, 4, '2024-03-26', 29),
+		(37, 1, '2024-04-05', 25),
+		(38, 2, '2024-04-13', 34),
+		(39, 3, '2024-04-19', 19),
+		(40, 4, '2024-04-27', 31),
+		(41, 1, '2024-05-06', 30),
+		(42, 2, '2024-05-14', 38),
+		(43, 3, '2024-05-20', 22),
+		(44, 4, '2024-05-29', 33),
+		(45, 1, '2024-06-04', 27),
+		(46, 2, '2024-06-12', 36),
+		(47, 3, '2024-06-18', 21),
+		(48, 4, '2024-06-25', 32),
+		(49, 1, '2024-06-28', 29),
+		(50, 2, '2024-06-30', 40);
+
+select st.sale_id,
+       pt.product_name,
+       st.sale_date, 
+       st.quantity_sold,
+       sum(st.quantity_sold) over (partition by st.product_id) as Total_Product_Sales
+from sales_table st
+left join product_table pt on pt.product_id = st.product_id
+order by pt.product_name, st.sale_date;
+
+With cte as (
+SELECT STRFTIME('%Y-%m', st.sale_date) as Sale_Month, 
+       sum(st.quantity_sold) as Monthly_Total_Sales
+FROM sales_table st
+LEFT JOIN product_table pt on pt.product_id = st.product_id
+GROUP BY Sale_Month 
+)
+Select Sale_Month,
+       Monthly_Total_Sales,
+       sum(Monthly_Total_Sales ) over (partition by substr(Sale_Month, 1, 4) order by Sale_Month) as Yearly_Running_Total
+From cte;
+
+with product_totals as (
+     select pt.product_name, 
+            sum(st.quantity_sold) as total_product_sales
+     from sales_table st
+     left join product_table pt on pt.product_id = st.product_id
+     group by pt.product_id, pt.product_name 
+),
+ranked as (
+    select *,
+           rank() over (order by total_product_sales desc) as sales_rank
+    from product_totals
+)
+select *
+from ranked
+where sales_rank <= 3;
