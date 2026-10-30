@@ -1,0 +1,129 @@
+Create Table If Not Exists emp_record_table (
+	EMP_ID VARCHAR(250) Primary Key, 
+	FIRST_NAME VARCHAR(250),
+	LAST_NAME VARCHAR(250), 
+	GENDER VARCHAR(250), 
+	ROLE VARCHAR(250),
+	DEPT VARCHAR(250), 
+	EXP INTEGER, 
+	COUNTRY VARCHAR(250),
+	CONTINENT VARCHAR(250), 
+	SALARY INTEGER,
+	EMP_RATING INTEGER, 
+	MANAGER_ID VARCHAR(250), 
+	PROJ_ID VARCHAR(250) References proj_table (PROJECT_ID)
+);
+
+Create Table If Not Exists proj_table (
+	PROJECT_ID VARCHAR(250) Primary Key, 
+	PROJ_NAME VARCHAR(250),
+	DOMAIN VARCHAR(250), 
+	START_DATE DATE, 
+	CLOSURE_DATE DATE,
+	DEV_QTR VARCHAR(250), 
+	STATUS VARCHAR(250)
+);
+
+Create Table If Not Exists data_science_team (
+	EMP_ID VARCHAR(250) Primary Key References emp_record_table (EMP_ID), 
+	FIRST_NAME VARCHAR(250),
+	LAST_NAME VARCHAR(250), 
+	GENDER VARCHAR(250), 
+	ROLE VARCHAR(250),
+	DEPT VARCHAR(250), 
+	EXP INTEGER, 
+	COUNTRY VARCHAR(250),
+	CONTINENT VARCHAR(250) 
+);
+
+Select EMP_ID, FIRST_NAME, GENDER, DEPT 
+From emp_record_table ert; 
+
+Select EMP_ID, FIRST_NAME, GENDER, DEPT, EMP_RATING
+From emp_record_table ert
+Where EMP_RATING < 2;
+
+Select EMP_ID, FIRST_NAME, GENDER, DEPT, EMP_RATING
+From emp_record_table ert
+Where EMP_RATING > 4;
+
+Select EMP_ID, FIRST_NAME, GENDER, DEPT, EMP_RATING
+From emp_record_table ert
+Where EMP_RATING between 2 and 4;
+
+Select EMP_ID, FIRST_NAME, GENDER, DEPT, EMP_RATING,
+	Case When EMP_RATING < 2 then 'Low'
+	 	 When EMP_RATING > 4 then 'high'
+	 	 Else 'Mid'
+End as Rating_Group 
+From emp_record_table ert;
+
+Select FIRST_NAME || ' ' || LAST_NAME as NAME
+From emp_record_table ert 
+Where DEPT = 'FINANCE';
+
+Select EMP_ID, FIRST_NAME, ROLE, DEPT
+From emp_record_table ert
+Where Role = 'MANAGER' or Role = 'PRESIDENT' or Role = 'CEO';
+
+Select EMP_ID, FIRST_NAME, ROLE, DEPT
+From emp_record_table ert
+Where DEPT = 'HEALTHCARE'
+Union  
+Select EMP_ID, FIRST_NAME, ROLE, DEPT
+From emp_record_table ert
+Where 'FINANCE';
+
+Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, DEPT, EMP_RATING, 
+Max(EMP_RATING) over (partition by DEPT) as DEPT_MAX_EMP_RTNG   
+From emp_record_table ert
+Order by DEPT;
+
+Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, SALARY, 
+Max(SALARY) over (partition by ROLE) as DEPT_MAX_SALARY,
+Min(SALARY) over (partition by ROLE) as DEPT_MIN_SALARY
+From emp_record_table ert
+Order by ROLE;
+
+Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, EXP, 
+Rank() over (order by EXP desc) as EXP_RANK  
+From emp_record_table ert;
+
+Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, SALARY, COUNTRY 
+From emp_record_table ert
+Where SALARY > 6000;
+
+Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, EXP 
+From (
+	Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, EXP
+	From emp_record_table ert
+) as SUB
+Where EXP > 10;
+
+Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, EXP, EXPECTED_ROLE,
+	  Case when Role = EXPECTED_ROLE then 'MATCH'
+	  Else 'MISMATCH'
+	  End as ROLE_STATUS
+From (
+	 Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, EXP,
+	 	Case When EXP <= 2 then'JUNIOR DATA SCIENTIST'
+	 		 When EXP <= 5 then 'ASSOCIATE DATA SCIENTIST'
+	 	 	 When EXP <= 10 then 'SENIOR DATA SCIENTIST'
+	 		 When EXP <= 12 then 'LEAD DATA SCIENTIST'
+	 		 When EXP <= 16 then 'MANAGER'
+	 		 Else 'NO STANDARD'
+ 		End as EXPECTED_ROLE 
+	From data_science_team dst 
+) as SUB
+Order by EMP_ID;
+
+Select EMP_ID, FIRST_NAME, LAST_NAME, ROLE, DEPT, EMP_RATING,
+SALARY * 0.05 * EMP_RATING as BONUS
+From emp_record_table ert
+Order by EMP_ID;
+
+Select COUNTRY, CONTINENT, AVG(SALARY) as Average_Salary
+From emp_record_table ert 
+Group by CONTINENT, COUNTRY
+Order by CONTINENT;
+
